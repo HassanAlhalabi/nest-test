@@ -14,7 +14,18 @@ import { CustomerModule } from './customer/customer.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {        
+      useFactory: (configService: ConfigService) => {   
+        console.log({
+        type: 'postgres',
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_DATABASE'),
+        entities: [User, Role], // Adjust the path to your entities
+        synchronize: false, // Disable in production!
+      })           
+      
         return ({
         type: 'postgres',
         host: configService.get<string>('DB_HOST'),
@@ -29,7 +40,7 @@ import { CustomerModule } from './customer/customer.module';
     ConfigModule.forRoot({ isGlobal: true,  envFilePath: `.env.${process.env.NODE_ENV || 'development'}`, }),
     BullModule.forRoot({
       connection: {
-        host: 'redis://red-cr7dj2q3esus7387ggr0:6379',
+        host: process.env.REDIS_HOST,
         port: 6379,
       },  
     }),

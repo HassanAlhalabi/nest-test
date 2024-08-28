@@ -7,6 +7,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 
 async function bootstrap() {
+
   const app = await NestFactory.create(AppModule);
 
   // Swagger config
@@ -28,6 +29,6 @@ async function bootstrap() {
     // Apply the global interceptor
   app.useGlobalInterceptors(new ResponseInterceptor());
 
-  await app.listen(3333);
+  await app.listen(process.env.port);
 }
 bootstrap();
