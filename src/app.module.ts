@@ -26,10 +26,10 @@ import { CustomerModule } from './customer/customer.module';
         synchronize: false, // Disable in production!
       })}
     }),
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true,  envFilePath: `.env.${process.env.NODE_ENV || 'development'}`, }),
     BullModule.forRoot({
       connection: {
-        host: 'localhost',
+        host: 'redis://red-cr7dj2q3esus7387ggr0:6379',
         port: 6379,
       },  
     }),
