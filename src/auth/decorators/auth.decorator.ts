@@ -4,7 +4,7 @@ import { Permission } from '../enum/permission.enum';
 import { GetPermission } from './permission.decorator';
 import { PermissionGuard, JWTGuard } from '../guards';
 
-export function Auth(...permissions: Permission[]) { // Check for array????
+export function Auth(...permissions: Permission[]) {
   return permissions.length > 0 ? applyDecorators(
     GetPermission(...permissions),
     UseGuards(JWTGuard, PermissionGuard)

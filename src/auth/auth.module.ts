@@ -6,7 +6,7 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies';
 import { JWTGuard, PermissionGuard } from './guards';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../user/entities/user.entity';
+import { User } from '../admin/user/entities/user.entity';
 
 @Module({
   imports: [JwtModule.register({

@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Repository } from 'typeorm';
-import { User } from '../../user/entities/user.entity';
+import { User } from '../../admin/user/entities/user.entity';
 
 
 
@@ -25,6 +25,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const userData = await this.userRepository.findOneBy({
         id: payload.userId,
     });
+
     delete userData.hash;
     return userData;
   }
