@@ -1,6 +1,6 @@
 import { applyGlobalWhereFilter, applyOrderBy } from './../../common/helpers/index';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { In, Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { CreateRoleDto } from './dto/create-role.dto';
@@ -9,6 +9,7 @@ import { Role } from './entities/role.entity';
 import { BaseFilter, PaginatedResult, SearchItem } from '../../common/types';
 import { applyPagination } from '../../common/helpers';
 import { Permission } from '../permissions/entities';
+import { SUPER_ADMIN_ROLE_NAME } from '../constants';
 
 @Injectable()
 export class RoleService {
@@ -36,7 +37,8 @@ export class RoleService {
         }
       },
       where: {
-        ...applyGlobalWhereFilter(filter)
+        ...applyGlobalWhereFilter(filter),
+        name: Not(SUPER_ADMIN_ROLE_NAME)
       },
       order: applyOrderBy(filter.orderBy, filter.isDesc),
       ...applyPagination(filter.page, filter.pageSize, filter.ignorePagination),
@@ -65,7 +67,8 @@ export class RoleService {
         name: true,
       },
       where: {
-        ...applyGlobalWhereFilter(filter)
+        ...applyGlobalWhereFilter(filter),
+        name: Not(SUPER_ADMIN_ROLE_NAME)
       },
       order: applyOrderBy(filter.orderBy, filter.isDesc),
       ...applyPagination(filter.page, filter.pageSize, filter.ignorePagination),
@@ -87,22 +90,23 @@ export class RoleService {
     return role;
   }
 
-  async create(createRoleDto: CreateRoleDto) {
+  async create(createRoleDto: CreateRoleDto, userId: number) {
     const permissions = await this.permissionRepository.find({
       where: {
         id: In(createRoleDto.grantedPermissions)
       }
     })
     const newRole = await this.roleRepository.save(
-     {
+     { 
       name: createRoleDto.displayName,
-      permissions
+      permissions,
+      creatorId: userId
      },
     );
     return newRole; 
   }
   
-  async update(updateRoleDto: UpdateRoleDto) {
+  async update(updateRoleDto: UpdateRoleDto, userId: number) {
     const permissions = await this.permissionRepository.find({
       where: {
         id: In(updateRoleDto.grantedPermissions)
@@ -111,27 +115,34 @@ export class RoleService {
     const updatedRole = await this.roleRepository.save({
       id: updateRoleDto.id,
       name: updateRoleDto.displayName,
-      permissions
+      permissions,
+      lastModifiedById: userId
     });
     return updatedRole;
   }
 
-  async activate(id: number) {
+  async activate(id: number, userId: number) {
     return await this.roleRepository.save({
       id,
-      isActive: true
+      isActive: true,
+      lastModifiedById: userId
     });
   }
 
-  async deActivate(id: number) {
+  async deActivate(id: number, userId: number) {
     return await this.roleRepository.save({
       id,
-      isActive: false
+      isActive: false,
+      lastModifiedById: userId
     });
   }
   
-  async remove(id: number) {
-    const deletedRole = await this.roleRepository.delete(id);
+  async remove(id: number, userId: number) {
+    const deletedRole = await this.roleRepository.save({
+      id,
+      isDeleted: true,
+      deletedById: userId
+    });
     return deletedRole;
   }
 }

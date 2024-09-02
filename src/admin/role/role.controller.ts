@@ -20,10 +20,11 @@ import { Lang, SwaggerFilter } from '../../common/decorators';
 import { AdminController } from '../decorators';
 import { SwaggerLang } from 'src/common/decorators/swagger-lang.decorator';
 import { PermissionService } from '../permissions/permission.service';
+import { UserId } from 'src/common/decorators/user-id.decorator';
 
-@AdminController('Role')
 @ApiTags('Roles')
 @ApiBearerAuth()
+@AdminController('Role')
 export class RoleController {
   constructor(
     private readonly permissionService: PermissionService,
@@ -61,33 +62,32 @@ export class RoleController {
 
   @Post('Create')
   @Auth(Permission.RoleUpsert)
-  create(@Body() createRoleDto: CreateRoleDto) {
-    return this.roleService.create(createRoleDto);
+  create(@Body() createRoleDto: CreateRoleDto, @UserId() userId) {
+    return this.roleService.create(createRoleDto, userId);
   }
 
   @Put('Update')
   @Auth(Permission.RoleUpsert)
-  update(@Body() updateRoleDto: UpdateRoleDto) {
-    return this.roleService.update(updateRoleDto);
+  update(@Body() updateRoleDto: UpdateRoleDto, @UserId() userId) {
+    console.log(userId)
+    return this.roleService.update(updateRoleDto, userId);
   }
 
   @Put('Activate')
   @Auth(Permission.RoleActivation)
-  activate(@Query('id',ParseIntPipe) id: number) {
-    console.log(id)
-    return this.roleService.activate(id);
+  activate(@Query('id',ParseIntPipe) id: number,  @UserId() userId) {
+    return this.roleService.activate(id, userId);
   }
 
   @Put('Deactivate')
   @Auth(Permission.RoleActivation)
-  deActivate(@Query('id',ParseIntPipe) id: number) {
-    console.log(id)
-    return this.roleService.deActivate(id);
+  deActivate(@Query('id',ParseIntPipe) id: number,  @UserId() userId) {
+    return this.roleService.deActivate(id, userId);
   }
 
   @Delete(':id')
   @Auth(Permission.RoleDelete)
-  remove(@Param('id') id: string) {
-    return this.roleService.remove(+id);
+  remove(@Param('id') id: string, @UserId() userId) {
+    return this.roleService.remove(+id, userId);
   }
 }

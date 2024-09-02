@@ -31,7 +31,7 @@ export class UserController {
 
   @Get('me')
   @ApiOperation({ summary: 'Get admin own details' })
-  // @UseGuards(JWTGuard)
+  @Auth(Permission.AdminView)
   getMyData(@GetUser() user: UserDto) {
     return user;
   }

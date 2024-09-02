@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { hash } from 'argon2';
+
 
 import { Permission as PermissionEnum } from '../permissions/enum';
 import { Role } from '../role/entities/role.entity';
 import { SUPER_ADMIN_ROLE_NAME, SUPER_ADMIN_EMAIL } from '../constants';
-import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
-import { hash } from 'argon2';
 import { Permission } from '../permissions/entities';
 
 @Injectable()
@@ -61,16 +62,21 @@ export class SeederService {
   
   // Admins Seed
   async seedAdmins() {
-    const superAdmin = await this.userRepository.findOneBy({email: SUPER_ADMIN_EMAIL})  
+    const superAdmin = await this.userRepository.findOneBy({ email: SUPER_ADMIN_EMAIL })  
     if(superAdmin) return
-    const superAdminRole = await this.roleRepository.findOneBy({name: SUPER_ADMIN_ROLE_NAME})
+    const superAdminRole = await this.roleRepository.findOneBy({ name: SUPER_ADMIN_ROLE_NAME })
     const hashedPassword = await hash('1234')
-    this.userRepository.save({
+    const savedAdmin = await this.userRepository.save({
       email: SUPER_ADMIN_EMAIL.toLocaleLowerCase(),
       hash: hashedPassword,
       firstName: 'Admin',
       lastName:'Admin',
       roleId: superAdminRole.id,
+    })
+    await this.userRepository.save({
+      id: savedAdmin.id,
+      creatorId: savedAdmin.id,
+      lastModifiedById: savedAdmin.id
     })
   }
 
