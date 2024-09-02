@@ -1,57 +1,92 @@
 import {
-  Controller,
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Query,
+  Put,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
-import { Auth } from '../../auth/decorators';
-import { Permission } from '../../auth/enum';
+import { Auth } from '../auth/decorators';
+import { Permission } from '../permissions/enum';
 import { BaseFilter } from '../../common/types';
 import { Lang, SwaggerFilter } from '../../common/decorators';
+import { AdminController } from '../decorators';
+import { SwaggerLang } from 'src/common/decorators/swagger-lang.decorator';
+import { PermissionService } from '../permissions/permission.service';
 
-@Controller('Admin/Roles')
+@AdminController('Role')
 @ApiTags('Roles')
 @ApiBearerAuth()
 export class RoleController {
-  constructor(private readonly roleService: RoleService) {}
+  constructor(
+    private readonly permissionService: PermissionService,
+    private readonly roleService: RoleService) {}
 
-  @Post()
-  // @Auth(Permission.CreateRole)
-  create(@Body() createRoleDto: CreateRoleDto) {
-    return this.roleService.create(createRoleDto);
-  }
-
-  @Get()
-  @Auth(Permission.ReadRole)
+  @Get('List')
+  @Auth(Permission.RoleView)
   @SwaggerFilter()
   findAll(@Query() filter: BaseFilter, @Lang() language) {    
     console.log(language)
     return this.roleService.findAll(filter);
   }
 
-  @Get(':id')
-  @Auth(Permission.ReadRole)
-  findOne(@Param('id') id: string) {
-    return this.roleService.findOne(+id);
+  @Get('Search')
+  @Auth(Permission.RoleView)
+  @SwaggerFilter()
+  searchRoles(@Query() filter: BaseFilter, @Lang() language) {    
+    console.log(language)
+    return this.roleService.search(filter);
   }
 
-  @Patch(':id')
-  @Auth(Permission.UpdateRole)
-  update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
-    return this.roleService.update(+id, updateRoleDto);
+  @Get('GetAllPermission')
+  @Auth(Permission.RoleView)
+  @SwaggerLang()
+  getAllPermissions(@Lang() language) {  
+    console.log(language);
+    return this.permissionService.getGroupedPermissions()
+  }
+
+  @Get(':id')
+  @Auth(Permission.RoleView)
+  findOne(@Param('id') id: string) {
+    return this.roleService.findById(+id);
+  }
+
+  @Post('Create')
+  @Auth(Permission.RoleUpsert)
+  create(@Body() createRoleDto: CreateRoleDto) {
+    return this.roleService.create(createRoleDto);
+  }
+
+  @Put('Update')
+  @Auth(Permission.RoleUpsert)
+  update(@Body() updateRoleDto: UpdateRoleDto) {
+    return this.roleService.update(updateRoleDto);
+  }
+
+  @Put('Activate')
+  @Auth(Permission.RoleActivation)
+  activate(@Query('id',ParseIntPipe) id: number) {
+    console.log(id)
+    return this.roleService.activate(id);
+  }
+
+  @Put('Deactivate')
+  @Auth(Permission.RoleActivation)
+  deActivate(@Query('id',ParseIntPipe) id: number) {
+    console.log(id)
+    return this.roleService.deActivate(id);
   }
 
   @Delete(':id')
-  @Auth(Permission.DeleteRole)
+  @Auth(Permission.RoleDelete)
   remove(@Param('id') id: string) {
     return this.roleService.remove(+id);
   }

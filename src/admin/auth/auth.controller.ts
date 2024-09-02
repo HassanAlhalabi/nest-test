@@ -5,17 +5,12 @@ import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
 
 @ApiTags('Auth')
-@Controller('Auth')
+@Controller('api/TokenAuth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Post('SignIn')
+  @Post('Authenticate')
   login(@Body() dto: AuthDto) {
     return this.authService.signIn(dto);
-  }
-
-  @Post('SignUp')
-  signUp(@Body() dto: AuthDto) {
-    return this.authService.signUp(dto);
   }
 }

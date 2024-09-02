@@ -1,11 +1,11 @@
-import { Controller, Get } from "@nestjs/common";
+import { Get } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 
 import { FaqService } from "./faq.service";
-import { MAIN_MODULES } from "src/common/contants";
+import { CustomerController } from "src/customer/decorators";
 
 
-@Controller(`${MAIN_MODULES.admin}/FAQ`)
+@CustomerController('Faq')
 @ApiTags('Faq')
 export class FaqController {
     constructor(private faqService: FaqService){}

@@ -16,9 +16,9 @@ export const applyGlobalWhereFilter = (filter: BaseFilter) => {
     return whereFilter
 }
 
-export const applyPagination = (page: number = 1,pageSize: number = 10, ignorePagination: boolean = false) => {
+export const applyPagination = (page: number = 0,pageSize: number = 10, ignorePagination: boolean = false) => {
     return ignorePagination ? {} : {
-        skip: (page - 1) * pageSize,
+        skip: page * pageSize,
         take: pageSize,
     }
 }

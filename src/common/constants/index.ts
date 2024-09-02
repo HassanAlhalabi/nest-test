@@ -1,5 +1,6 @@
 
 export const MAIN_MODULES = {
     admin: "Admin",
-    customer: "Customer"
+    customer: "Customer",
+    driver: 'Driver'
 } as const

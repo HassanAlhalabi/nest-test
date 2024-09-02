@@ -1,6 +1,6 @@
 import { applyDecorators, UseGuards } from '@nestjs/common';
 
-import { Permission } from '../enum/permission.enum';
+import { Permission } from '../../permissions/enum/permission.enum';
 import { GetPermission } from './permission.decorator';
 import { PermissionGuard, JWTGuard } from '../guards';
 

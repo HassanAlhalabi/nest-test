@@ -6,7 +6,7 @@ import { FaqDto } from "./dto/faq.dto";
 export class FaqService {
     filter(): PaginatedResult<FaqDto> {
         return {
-result: [],
+items: [],
 totalCount: 0
         }
     }

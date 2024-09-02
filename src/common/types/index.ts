@@ -2,7 +2,7 @@ import { Transform } from "class-transformer";
 import { IsBoolean, IsInt, IsOptional, IsString, Min } from "class-validator";
 
 export interface PaginatedResult<T> {
-  result: T[];
+  items: Partial<T>[];
   totalCount: number
 }
 
@@ -13,16 +13,21 @@ export interface CustomResult<T = any> {
   targetUrl: string
 }
 
+export interface SearchItem {
+  id: number,
+  name: string
+}
+
 export class BaseFilter {
   @IsOptional()
   @IsInt()
-  @Min(1)
+  @Min(0)
   @Transform(({ value }) => parseInt(value, 10))
   id?: number
 
   @IsOptional()
   @IsInt()
-  @Min(1)
+  @Min(0)
   @Transform(({ value }) => parseInt(value, 10))
   page?: number
   

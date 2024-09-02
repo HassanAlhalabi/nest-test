@@ -15,11 +15,13 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, any> {
   intercept(context: ExecutionContext, next: CallHandler<T>): Observable<any> {
     return next.handle().pipe(
       map((data) => ({
+        result: data, // The actual response data
         statusCode: context.switchToHttp().getResponse().statusCode,
         message: 'Request successful', // You can customize or override this message
-        data, // The actual response data
         timestamp: new Date().toISOString(),
-        success: true
+        targetUrl: null,
+        success: true,
+        error: null,
       })),
     );
   }

@@ -1,5 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
-import { ApiHeader, ApiQuery } from '@nestjs/swagger';
+import { ApiQuery } from '@nestjs/swagger';
+import { SwaggerLang } from './swagger-lang.decorator';
 
 export const SwaggerFilter = () => {
   return applyDecorators(
@@ -9,7 +10,7 @@ export const SwaggerFilter = () => {
       description: 'The page number to retrieve',
       schema: {
         type: 'integer',
-        default: 1, // Default value for Swagger
+        default: 0, // Default value for Swagger
       }
     }),
     ApiQuery({
@@ -95,13 +96,5 @@ export const SwaggerFilter = () => {
         type: 'string',
       }
     }),
-    ApiHeader({
-      name: 'Accept-Language',
-      description: 'Return list items by specific language',
-      required: false,
-      schema: {
-        type: 'string',
-        default: 'en-US'
-      }
-    })
+    SwaggerLang()
 )}

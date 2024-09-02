@@ -1,4 +1,4 @@
-import {  Injectable } from '@nestjs/common';
+import {  ConflictException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { hash } from 'argon2';
 import { FindOptionsOrder, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -35,7 +35,7 @@ export class UserService {
     })
 
     return {
-      result: data,
+      items: data,
       totalCount
     }
   }
@@ -48,14 +48,21 @@ export class UserService {
 
   async createNewUser(user: UserDto) {
     const hashedPassword = await hash(user.password);
-    const createdUser = await this.userRepository.save({
-        email: user.email,
-        hash: hashedPassword,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        roleId: user.roleId ?? 2, // Default value if not provided
-    });
-    return createdUser;
+    try {
+      const createdUser = await this.userRepository.save({
+          email: user.email,
+          hash: hashedPassword,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          roleId: user.roleId ?? 2, // Default value if not provided
+      });
+      return createdUser;
+    } catch(error) {
+      if (error.code === '23505') { // Unique violation
+        throw new ConflictException('Email already exists');
+      }
+      throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR)
+    }
   }
 
 
