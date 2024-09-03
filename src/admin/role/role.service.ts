@@ -1,4 +1,8 @@
-import { applyGlobalWhereFilter, applyOrderBy } from './../../common/helpers/index';
+import {
+  applyGlobalSelect,
+  applyGlobalWhereFilter,
+  applyOrderBy,
+} from './../../common/helpers/index';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { In, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,79 +14,82 @@ import { BaseFilter, PaginatedResult, SearchItem } from '../../common/types';
 import { applyPagination } from '../../common/helpers';
 import { Permission } from '../permissions/entities';
 import { SUPER_ADMIN_ROLE_NAME } from '../constants';
+import { DEFAULT_LANGUAGE } from 'src/common/constants';
 
 @Injectable()
 export class RoleService {
   constructor(
-    @InjectRepository(Role) private roleRepository:  Repository<Role>,
-    @InjectRepository(Permission) private permissionRepository: Repository<Permission>
+    @InjectRepository(Role) private roleRepository: Repository<Role>,
+    @InjectRepository(Permission)
+    private permissionRepository: Repository<Permission>
   ) {}
 
-  
-  async findAll(filter: BaseFilter): Promise<PaginatedResult<Role & { usersCount: number }>> {    
+  async filter(
+    filter: BaseFilter
+  ): Promise<PaginatedResult<Role & { usersCount: number }>> {
     const [data, totalCount] = await this.roleRepository.findAndCount({
       relations: {
         users: true,
-        permissions: true
+        permissions: true,
+        translations: true,
       },
       select: {
-        id: true, 
-        creationTime: true,
-        creatorId: true,
-        isActive: true,
+        ...applyGlobalSelect(),
         name: true,
         permissions: true,
         users: {
-          id: true
-        }
+          id: true,
+        },
       },
       where: {
         ...applyGlobalWhereFilter(filter),
-        name: Not(SUPER_ADMIN_ROLE_NAME)
+        name: Not(SUPER_ADMIN_ROLE_NAME),
       },
       order: applyOrderBy(filter.orderBy, filter.isDesc),
       ...applyPagination(filter.page, filter.pageSize, filter.ignorePagination),
-    })
-    
-    const formattedData = data.map(role => {
+    });
+
+    const formattedData = data.map((role) => {
       const formattedRole = {
         ...role,
-        displayName: role.name,
-        usersCount: role.users.length
-      }
-      delete formattedRole.users
-      return formattedRole
-    })
+        displayName:
+          role.translations.length > 0 ? role.translations[0]?.name : [],
+        usersCount: role.users.length,
+      };
+      delete formattedRole.users;
+
+      return formattedRole;
+    });
 
     return {
       items: formattedData,
-      totalCount
-    }
+      totalCount,
+    };
   }
 
-  async search(filter:BaseFilter): Promise<PaginatedResult<SearchItem>> {
-      const [data, totalCount] = await this.roleRepository.findAndCount({
+  async search(filter: BaseFilter): Promise<PaginatedResult<SearchItem>> {
+    const [data, totalCount] = await this.roleRepository.findAndCount({
       select: {
-        id: true, 
+        id: true,
         name: true,
       },
       where: {
         ...applyGlobalWhereFilter(filter),
-        name: Not(SUPER_ADMIN_ROLE_NAME)
+        name: Not(SUPER_ADMIN_ROLE_NAME),
       },
       order: applyOrderBy(filter.orderBy, filter.isDesc),
       ...applyPagination(filter.page, filter.pageSize, filter.ignorePagination),
-    })   
+    });
 
     return {
       items: data,
-      totalCount
-    }
+      totalCount,
+    };
   }
 
   async findById(id: number) {
     const role = await this.roleRepository.findOneBy({
-        id,
+      id,
     });
     if (role === null) {
       throw new NotFoundException();
@@ -93,30 +100,50 @@ export class RoleService {
   async create(createRoleDto: CreateRoleDto, userId: number) {
     const permissions = await this.permissionRepository.find({
       where: {
-        id: In(createRoleDto.grantedPermissions)
-      }
-    })
-    const newRole = await this.roleRepository.save(
-     { 
+        id: In(createRoleDto.grantedPermissions),
+      },
+    });
+    const newRole = await this.roleRepository.save({
       name: createRoleDto.displayName,
       permissions,
-      creatorId: userId
-     },
-    );
-    return newRole; 
+      creatorId: userId,
+      translations: [
+        {
+          isDefault: true,
+          language: DEFAULT_LANGUAGE,
+          name: createRoleDto.displayName,
+        },
+      ],
+    });
+    return newRole;
   }
-  
+
   async update(updateRoleDto: UpdateRoleDto, userId: number) {
+    // Get granted permissions from IDs
     const permissions = await this.permissionRepository.find({
       where: {
-        id: In(updateRoleDto.grantedPermissions)
-      }
-    })
+        id: In(updateRoleDto.grantedPermissions),
+      },
+    });
+    // Get original translations
+    const roleTranslations = await this.roleRepository.find({
+      relations: { translations: true },
+      where: {
+        id: updateRoleDto.id,
+      },
+    });
+    // Update
     const updatedRole = await this.roleRepository.save({
       id: updateRoleDto.id,
       name: updateRoleDto.displayName,
       permissions,
-      lastModifiedById: userId
+      translations: [
+        {
+          ...roleTranslations[0].translations[0],
+          name: updateRoleDto.displayName,
+        },
+      ],
+      lastModifiedById: userId,
     });
     return updatedRole;
   }
@@ -125,7 +152,7 @@ export class RoleService {
     return await this.roleRepository.save({
       id,
       isActive: true,
-      lastModifiedById: userId
+      lastModifiedById: userId,
     });
   }
 
@@ -133,15 +160,15 @@ export class RoleService {
     return await this.roleRepository.save({
       id,
       isActive: false,
-      lastModifiedById: userId
+      lastModifiedById: userId,
     });
   }
-  
+
   async remove(id: number, userId: number) {
     const deletedRole = await this.roleRepository.save({
       id,
       isDeleted: true,
-      deletedById: userId
+      deletedById: userId,
     });
     return deletedRole;
   }

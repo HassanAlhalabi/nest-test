@@ -1,75 +1,74 @@
-import { Transform } from "class-transformer";
-import { IsBoolean, IsInt, IsOptional, IsString, Min } from "class-validator";
+import { Transform } from 'class-transformer';
+import { IsBoolean, IsInt, IsOptional, IsString, Min } from 'class-validator';
 
 export interface PaginatedResult<T> {
   items: Partial<T>[];
-  totalCount: number
+  totalCount: number;
 }
 
 export interface CustomResult<T = any> {
-  error: string
-  result: T
-  success: boolean
-  targetUrl: string
+  error: string;
+  result: T;
+  success: boolean;
+  targetUrl: string;
 }
 
 export interface SearchItem {
-  id: number,
-  name: string
+  id: number;
+  name: string;
 }
-
 export class BaseFilter {
   @IsOptional()
   @IsInt()
   @Min(0)
   @Transform(({ value }) => parseInt(value, 10))
-  id?: number
+  id?: number;
 
   @IsOptional()
   @IsInt()
   @Min(0)
   @Transform(({ value }) => parseInt(value, 10))
-  page?: number
-  
+  page?: number;
+
   @IsOptional()
   @IsInt()
   @Min(1)
   @Transform(({ value }) => parseInt(value, 10))
-  pageSize?: number
-  
+  pageSize?: number;
+
   @IsBoolean()
   @IsOptional()
   @Transform(({ value }) => value === 'true' || value === true)
-  ignorePagination?: boolean
-  
-  @IsString()
-  @IsOptional()
-  search?: string
-  
-  @IsBoolean()
-  @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
-  isActive?: boolean
-  
-  @IsBoolean()
-  @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
-  isDeleted?: boolean
+  ignorePagination?: boolean;
 
   @IsString()
   @IsOptional()
-  minDate?: Date
-  
+  search?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  isActive?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  isDeleted?: boolean;
+
   @IsString()
   @IsOptional()
-  maxDate?: Date
-  
+  minDate?: Date;
+
   @IsString()
   @IsOptional()
-  orderBy?: string
-  
+  maxDate?: Date;
+
+  @IsString()
+  @IsOptional()
+  orderBy?: string;
+
   @IsBoolean()
   @IsOptional()
   @Transform(({ value }) => value === 'true')
-  isDesc?: boolean
+  isDesc?: boolean;
 }

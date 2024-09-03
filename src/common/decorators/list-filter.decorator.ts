@@ -3,8 +3,6 @@ import { plainToClass } from 'class-transformer';
 import { validateOrReject } from 'class-validator';
 import { BaseFilter } from '../types';
 
-
-
 export const ListFilter = createParamDecorator(
   async (data: unknown, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
@@ -15,7 +13,7 @@ export const ListFilter = createParamDecorator(
     const filter: BaseFilter = {
       ...query,
       acceptLanguage,
-    }
+    };
 
     // Transform the filter object to the BaseFilter class
     const filterObject = plainToClass(BaseFilter, filter);
@@ -29,6 +27,6 @@ export const ListFilter = createParamDecorator(
       throw new Error('Validation failed');
     }
 
-    return filter
-  },
+    return filter;
+  }
 );

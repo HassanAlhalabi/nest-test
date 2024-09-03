@@ -14,8 +14,8 @@ import { PermissionModule } from './admin/permissions/permission.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {   
-        return ({
+      useFactory: (configService: ConfigService) => {
+        return {
           type: 'postgres',
           host: configService.get<string>('DB_HOST'),
           port: configService.get<number>('DB_PORT'),
@@ -24,20 +24,24 @@ import { PermissionModule } from './admin/permissions/permission.module';
           database: configService.get<string>('DB_DATABASE'),
           synchronize: false, // Disable in production!,
           autoLoadEntities: true,
-      })}
+        };
+      },
     }),
-    ConfigModule.forRoot({ isGlobal: true,  envFilePath: `.env.${process.env.NODE_ENV || 'development'}`, }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
+    }),
     BullModule.forRoot({
       connection: {
         host: process.env.REDIS_HOST,
         port: 6379,
-      },  
+      },
     }),
     AuthModule,
     AdminModule,
     CustomerModule,
     PermissionModule,
-    SeederModule
+    SeederModule,
   ],
 })
 export class AppModule {}

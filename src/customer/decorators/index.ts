@@ -1,1 +1,1 @@
-export * from './customer-controller.decorator'
+export * from './customer-controller.decorator';

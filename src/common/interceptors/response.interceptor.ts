@@ -1,6 +1,3 @@
-
-
-
 import {
   Injectable,
   NestInterceptor,
@@ -22,7 +19,7 @@ export class ResponseInterceptor<T> implements NestInterceptor<T, any> {
         targetUrl: null,
         success: true,
         error: null,
-      })),
+      }))
     );
   }
 }

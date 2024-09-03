@@ -1,19 +1,19 @@
-import { Column,Entity, ManyToMany, PrimaryGeneratedColumn} from "typeorm";
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
-import { Permission as PermissionEnum } from "../enum"
-import { Role } from "../../role/entities";
+import { Permission as PermissionEnum } from '../enum';
+import { Role } from '../../role/entities';
 
 @Entity('permissions')
 export class Permission {
-    @PrimaryGeneratedColumn()
-    id?: number
-    
-    @Column()
-    name: PermissionEnum;
+  @PrimaryGeneratedColumn()
+  id?: number;
 
-    @Column({unique: true})
-    displayName: string
+  @Column()
+  name: PermissionEnum;
 
-    @ManyToMany(() => Role, (role) => role.permissions)
-    roles?: Role[];
+  @Column({ unique: true })
+  displayName: string;
+
+  @ManyToMany(() => Role, (role) => role.permissions)
+  roles?: Role[];
 }

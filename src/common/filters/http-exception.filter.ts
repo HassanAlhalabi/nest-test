@@ -25,15 +25,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
       if (response instanceof Object) {
         // @ts-expect-error type error
         message = response.message;
-        if(Array.isArray(message)){
-          message = message[0]
+        if (Array.isArray(message)) {
+          message = message[0];
         }
       } else {
-        message = response
+        message = response;
       }
     } else if (exception instanceof TypeORMError) {
-      message = exception.message
-      
+      message = exception.message;
     } else if (exception instanceof Error) {
       // Generic error handling
       message = exception.message;

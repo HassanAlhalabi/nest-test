@@ -9,9 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
 
 @Module({
-  imports: [JwtModule.register({
-  }),
-  TypeOrmModule.forFeature([User])],
+  imports: [JwtModule.register({}), TypeOrmModule.forFeature([User])],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, JWTGuard, PermissionGuard],
   exports: [AuthService, JWTGuard, PermissionGuard],

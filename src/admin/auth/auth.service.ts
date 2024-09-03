@@ -18,10 +18,10 @@ export class AuthService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     private jwtService: JwtService,
-    private configService: ConfigService,
+    private configService: ConfigService
   ) {}
 
-  private expiresIn = Number(this.configService.get('ACCESS_TOKEN_EXPIRATION'))
+  private expiresIn = Number(this.configService.get('ACCESS_TOKEN_EXPIRATION'));
 
   @HttpCode(HttpStatus.OK)
   async signIn(userDto: AuthDto) {
@@ -29,78 +29,77 @@ export class AuthService {
 
     try {
       const user = await this.userRepository.findOne({
-          relations:{
-            role: {
-              permissions: true,
-            }
+        relations: {
+          role: {
+            permissions: true,
           },
-          where:{
-            email: userDto.userNameOrEmailAddress.toLocaleLowerCase(),
-          }
+        },
+        where: {
+          emailAddress: userDto.userNameOrEmailAddress.toLocaleLowerCase(),
+        },
       });
 
       // Check if exists
       if (!user) {
-        throw new InternalServerErrorException('Invalid email address or password');
+        throw new InternalServerErrorException(
+          'Invalid email address or password'
+        );
       }
 
       // Check password
       const isValidPassword = await verify(user.hash, userDto.password);
 
       if (!isValidPassword) {
-        throw new  InternalServerErrorException('Invalid email address or password');
+        throw new InternalServerErrorException(
+          'Invalid email address or password'
+        );
       }
 
-      const token = await this.signToken(user.id, user.email);
+      const token = await this.signToken(user.id, user.emailAddress);
 
       return {
-              accessToken: token,
-              refreshToken: "string",
-              discriminator: 1,
-              encryptedAccessToken: "string",
-              expireInSeconds: this.expiresIn,
-              image: "string",
-              name: `${user.firstName} ${user.lastName}`,
-              roles: [
-                user.role
-              ],
-              userId: user.id,
-              // tenantId: 0,
-              siteSettings: {
-                websiteUrl: "string",
-                // templateColors: {
-                //   "primaryColor": "#9BbfD2",
-                //   "primaryDarkColor": "#10E8a5",
-                //   "primaryLightColor": "#0f7460",
-                //   "successColor": "#5825FD",
-                //   "successDarkColor": "#EFb",
-                //   "successLightColor": "#90c",
-                //   "warningColor": "#AA6",
-                //   "warningDarkColor": "#075",
-                //   "warningLightColor": "#45609F"
-                // },
-                // tenantName: "string",
-                logoUrl: "string",
-                logoWithNameUrl: "string",
-                displayLanguages: [
-                  "en-US"
-                ],
-                dataLanguages: [
-                  "en-US"
-                ],
-                defaultLanguage: "en-US",
-                // firebaseFrontendConfigs: {
-                //   "additionalProp1": "string",
-                //   "additionalProp2": "string",
-                //   "additionalProp3": "string"
-                // }
-              },
-              // "plugins": {
-              //   "additionalProp1": true,
-              //   "additionalProp2": true,
-              //   "additionalProp3": true
-              // }
-            };
+        accessToken: token,
+        refreshToken: 'string',
+        discriminator: 1,
+        encryptedAccessToken: 'string',
+        expireInSeconds: this.expiresIn,
+        image: 'string',
+        fullName: `${user.name} ${user.surname}`,
+        name: user.name,
+        roles: [user.role],
+        userId: user.id,
+        // tenantId: 0,
+        siteSettings: {
+          websiteUrl: 'string',
+          // templateColors: {
+          //   "primaryColor": "#9BbfD2",
+          //   "primaryDarkColor": "#10E8a5",
+          //   "primaryLightColor": "#0f7460",
+          //   "successColor": "#5825FD",
+          //   "successDarkColor": "#EFb",
+          //   "successLightColor": "#90c",
+          //   "warningColor": "#AA6",
+          //   "warningDarkColor": "#075",
+          //   "warningLightColor": "#45609F"
+          // },
+          // tenantName: "string",
+          logoUrl: 'string',
+          logoWithNameUrl: 'string',
+          displayLanguages: ['en-US'],
+          dataLanguages: ['en-US'],
+          defaultLanguage: 'en-US',
+          // firebaseFrontendConfigs: {
+          //   "additionalProp1": "string",
+          //   "additionalProp2": "string",
+          //   "additionalProp3": "string"
+          // }
+        },
+        // "plugins": {
+        //   "additionalProp1": true,
+        //   "additionalProp2": true,
+        //   "additionalProp3": true
+        // }
+      };
     } catch (error) {
       throw error;
     }

@@ -1,88 +1,147 @@
-import {  ConflictException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { hash } from 'argon2';
-import { FindOptionsOrder, Repository } from 'typeorm';
+import { FindOptionsOrder, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { SimpleUserDto, UserDto } from './dto';
+import { UserDto } from './dto';
 import { User } from './entities/user.entity';
 import { BaseFilter, PaginatedResult } from '../../common/types';
-import {  applyGlobalWhereFilter, applyOrderBy, applyPagination } from '../../common/helpers';
+import {
+  applyGlobalSelect,
+  applyGlobalWhereFilter,
+  applyOrderBy,
+  applyPagination,
+} from '../../common/helpers';
+import { plainToInstance } from 'class-transformer';
+import { SUPER_ADMIN_EMAIL } from '../constants';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(User)
-    private readonly userRepository: Repository<User>,) {}
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>
+  ) {}
 
-  async filter(filter: BaseFilter): Promise<PaginatedResult<SimpleUserDto>> {
-
+  async filter(filter: BaseFilter): Promise<PaginatedResult<UserDto>> {
     const [data, totalCount] = await this.userRepository.findAndCount({
-      relations: {
-       role: true
-      },
       where: {
-        ...applyGlobalWhereFilter(filter)
+        ...applyGlobalWhereFilter(filter),
+        emailAddress: Not(SUPER_ADMIN_EMAIL),
       },
       select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        creationTime: true,
-        email: true,
-        isActive: true,
+        ...applyGlobalSelect(),
+        name: true,
+        surname: true,
+        emailAddress: true,
+        phoneNumber: true,
       },
       order: this.applyUserOrder(filter.orderBy, filter.isDesc),
       ...applyPagination(filter.page, filter.pageSize, filter.ignorePagination),
-    })
+    });
 
     return {
-      items: data,
-      totalCount
-    }
+      items: data.map((item) => ({
+        ...plainToInstance(UserDto, item),
+        fullName: `${item.name} ${item.surname}`,
+      })),
+      totalCount,
+    };
   }
 
   async getById(id: number) {
-    const user = await this.userRepository.findOneBy({id})
-    delete user.hash
-    return user;
+    const user = await this.userRepository.findOne({ 
+      relations: {
+        role: true,
+      },
+      where: {
+        id,
+      },
+      select: {
+        ...applyGlobalSelect(),
+        name: true,
+        surname: true,
+        emailAddress: true,
+        phoneNumber: true,
+        role: {
+          id: true,
+          name: true
+        }
+      }
+    });
+    return {...user, roleNames: [user.role]};
   }
 
-  async createNewUser(user: UserDto) {
+  async create(user: CreateUserDto) {
     const hashedPassword = await hash(user.password);
     try {
-      const createdUser = await this.userRepository.save({
-          email: user.email,
-          hash: hashedPassword,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          roleId: user.roleId ?? 2, // Default value if not provided
-      });
-      return createdUser;
-    } catch(error) {
-      if (error.code === '23505') { // Unique violation
-        throw new ConflictException('Email already exists');
+      const newUser = this.userRepository.create({...user, hash: hashedPassword})
+      const savedUser = await this.userRepository.save(newUser);
+      return savedUser;
+    } catch (error) {
+      if (error.code === '23505') {
+        // Unique violation
+        throw new ConflictException('Email or phone number already exists');
       }
-      throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR)
+      throw new HttpException(
+        error,
+        HttpStatus.INTERNAL_SERVER_ERROR
+      );
     }
   }
 
+  async update(user: UpdateUserDto) {
+    const savedUser = await this.userRepository.save(user);
+    return savedUser;
+  }
+
+  async activate(id: number, userId: number) {
+    return await this.userRepository.save({
+      id,
+      isActive: true,
+      lastModifiedById: userId,
+    });
+  }
+
+  async deActivate(id: number, userId: number) {
+    return await this.userRepository.save({
+      id,
+      isActive: false,
+      lastModifiedById: userId,
+    });
+  }
+
+  async remove(id: number, userId: number) {
+    const deletedRole = await this.userRepository.save({
+      id,
+      isDeleted: true,
+      deletedById: userId,
+    });
+    return deletedRole;
+  }
 
   applyUserOrder(orderBy: string, isDesc: boolean): FindOptionsOrder<User> {
     switch (orderBy) {
-        case 'firstName':
-            return {
-                firstName: isDesc ? 'DESC' : 'ASC' 
-            }
-        case 'lastName':
-            return {
-                lastName: isDesc ? 'DESC' : 'ASC' 
-            }
-        case 'email':
-            return {
-                email: isDesc ? 'DESC' : 'ASC' 
-            }
-        default:
-            return applyOrderBy(orderBy, isDesc)
+      case 'firstName':
+        return {
+          name: isDesc ? 'DESC' : 'ASC',
+        };
+      case 'lastName':
+        return {
+          surname: isDesc ? 'DESC' : 'ASC',
+        };
+      case 'email':
+        return {
+          emailAddress: isDesc ? 'DESC' : 'ASC',
+        };
+      default:
+        return applyOrderBy(orderBy, isDesc);
     }
   }
-
 }

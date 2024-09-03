@@ -1,4 +1,5 @@
 import { Permission } from './admin/permissions/entities/permission.entity';
+import { RoleTranslation } from './admin/role/entities/role-translation.entity';
 import { Role } from './admin/role/entities/role.entity';
 import { User } from './admin/user/entities/user.entity';
 
@@ -11,7 +12,7 @@ export const AppDataSource = new DataSource({
   username: 'hassan',
   password: '12345',
   database: 'starter',
-  entities: [User, Role, Permission],
+  entities: [User, Role, RoleTranslation, Permission],
   migrations: ['./src/migrations/*.ts'],
   logging: true,
 });

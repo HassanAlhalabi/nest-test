@@ -1,6 +1,6 @@
-import { Controller } from "@nestjs/common";
+import { Controller } from '@nestjs/common';
 
-import { MAIN_MODULES } from "src/common/constants";
+import { MAIN_MODULES } from 'src/common/constants';
 
 // Create a decorator for Admin routes
 export const AdminController = (path?: string): ClassDecorator => {

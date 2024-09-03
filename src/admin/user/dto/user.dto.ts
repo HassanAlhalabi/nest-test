@@ -1,28 +1,35 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsInt, IsOptional, IsString } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
-export class UserDto {
-  @ApiProperty()
-  @IsEmail()
-  email: string;
+import { BaseAdminDto } from 'src/admin/dto/base.dto';
+import { SearchItem } from 'src/common/types';
+export class UserDto extends BaseAdminDto {
+  @ApiPropertyOptional()
+  emailAddress: string;
 
-  @ApiProperty()
-  @IsOptional()
-  @IsString()
+  @ApiPropertyOptional()
   password: string;
 
-  @ApiProperty()
-  @IsOptional()
-  @IsString()
-  firstName?: string;
+  @ApiPropertyOptional()
+  name?: string;
 
-  @ApiProperty()
-  @IsOptional()
-  @IsString()
-  lastName?: string;
+  @ApiPropertyOptional()
+  surname?: string;
 
-  @IsOptional()
-  @IsInt()
-  @ApiProperty()
+  @ApiPropertyOptional()
   roleId: number;
+
+  @ApiPropertyOptional()
+  textCreationTime: string;
+
+  @ApiPropertyOptional()
+  fullName: string;
+
+  @ApiPropertyOptional()
+  phoneNumber: string;
+
+  @ApiPropertyOptional()
+  roleNames: SearchItem[];
+
+  @ApiPropertyOptional()
+  userName: string;
 }

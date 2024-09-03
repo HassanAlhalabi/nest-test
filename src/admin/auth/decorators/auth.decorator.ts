@@ -5,8 +5,10 @@ import { GetPermission } from './permission.decorator';
 import { PermissionGuard, JWTGuard } from '../guards';
 
 export function Auth(...permissions: Permission[]) {
-  return permissions.length > 0 ? applyDecorators(
-    GetPermission(...permissions),
-    UseGuards(JWTGuard, PermissionGuard)
-  ) : UseGuards(JWTGuard)
+  return permissions.length > 0
+    ? applyDecorators(
+        GetPermission(...permissions),
+        UseGuards(JWTGuard, PermissionGuard)
+      )
+    : UseGuards(JWTGuard);
 }

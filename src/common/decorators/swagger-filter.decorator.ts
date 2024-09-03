@@ -11,7 +11,7 @@ export const SwaggerFilter = () => {
       schema: {
         type: 'integer',
         default: 0, // Default value for Swagger
-      }
+      },
     }),
     ApiQuery({
       name: 'pageSize',
@@ -20,7 +20,7 @@ export const SwaggerFilter = () => {
       schema: {
         type: 'integer',
         default: 10, // Default value for Swagger
-      }
+      },
     }),
     ApiQuery({
       name: 'ignorePagination',
@@ -28,7 +28,7 @@ export const SwaggerFilter = () => {
       required: false,
       schema: {
         type: 'boolean',
-      }
+      },
     }),
     ApiQuery({
       name: 'isActive',
@@ -44,7 +44,7 @@ export const SwaggerFilter = () => {
       required: false,
       schema: {
         type: 'int',
-      }
+      },
     }),
     ApiQuery({
       name: 'isDeleted',
@@ -52,7 +52,7 @@ export const SwaggerFilter = () => {
       required: false,
       schema: {
         type: 'boolean',
-      }
+      },
     }),
     ApiQuery({
       name: 'minDate',
@@ -60,8 +60,8 @@ export const SwaggerFilter = () => {
       required: false,
       schema: {
         type: 'date',
-        format: 'date-time'
-      }
+        format: 'date-time',
+      },
     }),
     ApiQuery({
       name: 'maxDate',
@@ -69,8 +69,8 @@ export const SwaggerFilter = () => {
       required: false,
       schema: {
         type: 'date',
-        format: 'date-time'
-      }
+        format: 'date-time',
+      },
     }),
     ApiQuery({
       name: 'orderBy',
@@ -78,7 +78,7 @@ export const SwaggerFilter = () => {
       required: false,
       schema: {
         type: 'string',
-      }
+      },
     }),
     ApiQuery({
       name: 'isDesc',
@@ -86,7 +86,7 @@ export const SwaggerFilter = () => {
       required: false,
       schema: {
         type: 'boolean',
-      }
+      },
     }),
     ApiQuery({
       name: 'search',
@@ -94,7 +94,8 @@ export const SwaggerFilter = () => {
       required: false,
       schema: {
         type: 'string',
-      }
+      },
     }),
     SwaggerLang()
-)}
+  );
+};

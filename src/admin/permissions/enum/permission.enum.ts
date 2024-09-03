@@ -1,18 +1,19 @@
 export enum Permission {
-  AdminView='Admin.View' ,
-  AdminUpsert='Admin.ViewAndUpsert',
-  AdminActivation='Admin.ViewAnActivation' ,
+  AdminView = 'Admin.View',
+  AdminUpsert = 'Admin.ViewAndUpsert',
+  AdminActivation = 'Admin.ViewAndActivation',
+  AdminDelete = 'Admin.ViewAndDelete',
 
-  PermissionView="Permission.View",
-  PermissionUpsert="Permission.Upsert",
+  PermissionView = 'Permission.View',
+  PermissionUpsert = 'Permission.Upsert',
 
-  RoleView='Role.View',
-  RoleUpsert='Role.ViewAndUpsert',
-  RoleActivation='Role.ViewAndActivation',
-  RoleDelete='Role.ViewAndDelete',
+  RoleView = 'Role.View',
+  RoleUpsert = 'Role.ViewAndUpsert',
+  RoleActivation = 'Role.ViewAndActivation',
+  RoleDelete = 'Role.ViewAndDelete',
 
-  ConfigView='Config.View',
-  ConfigUpsert='Config.ViewAndUpsert',
+  ConfigView = 'Config.View',
+  ConfigUpsert = 'Config.ViewAndUpsert',
 
-  FaqView='Faq.View'
+  FaqView = 'Faq.View',
 }

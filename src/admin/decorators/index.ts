@@ -1,1 +1,1 @@
-export * from './admin-controller.decorator'
+export * from './admin-controller.decorator';

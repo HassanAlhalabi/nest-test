@@ -9,7 +9,7 @@ export class AuthDto {
 
   @ApiPropertyOptional()
   @IsBoolean()
-  rememberClient: boolean
+  rememberClient: boolean;
 
   @ApiProperty()
   @IsString()

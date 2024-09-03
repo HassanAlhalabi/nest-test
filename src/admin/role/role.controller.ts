@@ -16,7 +16,7 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 import { Auth } from '../auth/decorators';
 import { Permission } from '../permissions/enum';
 import { BaseFilter } from '../../common/types';
-import { Lang, SwaggerFilter } from '../../common/decorators';
+import { SwaggerFilter } from '../../common/decorators';
 import { AdminController } from '../decorators';
 import { SwaggerLang } from 'src/common/decorators/swagger-lang.decorator';
 import { PermissionService } from '../permissions/permission.service';
@@ -28,30 +28,28 @@ import { UserId } from 'src/common/decorators/user-id.decorator';
 export class RoleController {
   constructor(
     private readonly permissionService: PermissionService,
-    private readonly roleService: RoleService) {}
+    private readonly roleService: RoleService
+  ) {}
 
   @Get('List')
   @Auth(Permission.RoleView)
   @SwaggerFilter()
-  findAll(@Query() filter: BaseFilter, @Lang() language) {    
-    console.log(language)
-    return this.roleService.findAll(filter);
+  findAll(@Query() filter: BaseFilter) {
+    return this.roleService.filter(filter);
   }
 
   @Get('Search')
   @Auth(Permission.RoleView)
   @SwaggerFilter()
-  searchRoles(@Query() filter: BaseFilter, @Lang() language) {    
-    console.log(language)
+  searchRoles(@Query() filter: BaseFilter) {
     return this.roleService.search(filter);
   }
 
   @Get('GetAllPermission')
   @Auth(Permission.RoleView)
   @SwaggerLang()
-  getAllPermissions(@Lang() language) {  
-    console.log(language);
-    return this.permissionService.getGroupedPermissions()
+  getAllPermissions() {
+    return this.permissionService.getGroupedPermissions();
   }
 
   @Get(':id')
@@ -69,25 +67,24 @@ export class RoleController {
   @Put('Update')
   @Auth(Permission.RoleUpsert)
   update(@Body() updateRoleDto: UpdateRoleDto, @UserId() userId) {
-    console.log(userId)
     return this.roleService.update(updateRoleDto, userId);
   }
 
   @Put('Activate')
   @Auth(Permission.RoleActivation)
-  activate(@Query('id',ParseIntPipe) id: number,  @UserId() userId) {
+  activate(@Query('id', ParseIntPipe) id: number, @UserId() userId) {
     return this.roleService.activate(id, userId);
   }
 
   @Put('Deactivate')
   @Auth(Permission.RoleActivation)
-  deActivate(@Query('id',ParseIntPipe) id: number,  @UserId() userId) {
+  deActivate(@Query('id', ParseIntPipe) id: number, @UserId() userId) {
     return this.roleService.deActivate(id, userId);
   }
 
-  @Delete(':id')
+  @Delete('Delete')
   @Auth(Permission.RoleDelete)
-  remove(@Param('id') id: string, @UserId() userId) {
+  remove(@Query('id') id: string, @UserId() userId) {
     return this.roleService.remove(+id, userId);
   }
 }

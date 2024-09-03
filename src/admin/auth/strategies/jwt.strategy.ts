@@ -6,8 +6,6 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Repository } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 
-
-
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
@@ -23,14 +21,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: { userId: number; email: string }) {
     const userData = await this.userRepository.findOne({
-        relations: {
-          role: {
-            permissions: true
-          }
+      relations: {
+        role: {
+          permissions: true,
         },
-        where: {
-          id: payload.userId
-        }
+      },
+      where: {
+        id: payload.userId,
+      },
     });
 
     delete userData.hash;

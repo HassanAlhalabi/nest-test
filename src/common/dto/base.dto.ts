@@ -1,9 +1,12 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class BaseDto {
-    @ApiProperty()
-    id: string
+  @ApiPropertyOptional({description: 'Item id'})
+  id: string;
 
-    @ApiProperty()
-    isActive: boolean
+  @ApiPropertyOptional({description: 'Item status: active or not'})
+  isActive: boolean;
+
+  @ApiPropertyOptional({description: 'Item creation time'})
+  creationTime: Date;
 }

@@ -1,6 +1,8 @@
-import { createParamDecorator, ExecutionContext } from "@nestjs/common";
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
-export const Lang = createParamDecorator((data: unknown, ctx: ExecutionContext) => {
+export const Lang = createParamDecorator(
+  (data: unknown, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest();
-    return request.headers['accept-language']
-})
+    return request.headers['accept-language'];
+  }
+);
